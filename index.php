@@ -1,6 +1,15 @@
 <?php
 
 declare(strict_types=1);
+
+/**
+ * @var array $transactions Массив транзакций, каждая содержит:
+ * - int "id" — идентификатор транзакции.
+ * - string "date" — дата транзакции (в формате YYYY-MM-DD).
+ * - float "amount" — сумма транзакции.
+ * - string "description" — описание покупки.
+ * - string "merchant" — название магазина.
+ */
 $transactions = [
     [
         "id" => 1,
@@ -25,6 +34,34 @@ $transactions = [
     ],
 ];
 
+/**
+ * Сортирует транзакции по дате.
+ *
+ * @param array $a Первая транзакция.
+ * @param array $b Вторая транзакция.
+ * @return int Разница во времени.
+ */
+usort($transactions, function ($a, $b) {
+    return strtotime($a["date"]) - strtotime($b["date"]);
+});
+
+/**
+ * Сортирует транзакции по сумме (по убыванию).
+ *
+ * @param array $a Первая транзакция.
+ * @param array $b Вторая транзакция.
+ * @return int -1, 0 или 1 в зависимости от сравнения сумм.
+ */
+usort($transactions, function ($a, $b) {
+    return $b['amount'] <=> $a['amount'];
+});
+
+/**
+ * Вычисляет общую сумму всех транзакций.
+ *
+ * @param array $transactions Массив транзакций.
+ * @return float Общая сумма всех транзакций.
+ */
 function calculateTotalAmount(array $transactions): float {
     $total = 0;
     foreach ($transactions as $transaction) {
@@ -33,6 +70,12 @@ function calculateTotalAmount(array $transactions): float {
     return $total;
 }
 
+/**
+ * Ищет транзакцию по части описания.
+ *
+ * @param string $descriptionPart Часть описания для поиска.
+ * @return array|null Найденная транзакция или null, если не найдено.
+ */
 function findTransactionByDescription(string $descriptionPart) {
     global $transactions;
     foreach ($transactions as $transaction) {
@@ -43,6 +86,12 @@ function findTransactionByDescription(string $descriptionPart) {
     return null;
 }
 
+/**
+ * Ищет транзакцию по ID.
+ *
+ * @param int $id Идентификатор транзакции.
+ * @return array|null Найденная транзакция или null, если не найдено.
+ */
 function findTransactionById(int $id) {
     global $transactions;
     foreach ($transactions as $transaction) {
@@ -53,7 +102,12 @@ function findTransactionById(int $id) {
     return null;
 }
 
-
+/**
+ * Вычисляет количество дней, прошедших с даты транзакции.
+ *
+ * @param string $date Дата транзакции (формат YYYY-MM-DD).
+ * @return int Количество дней с даты транзакции.
+ */
 function daysSinceTransaction(string $date): int {
     $transactionDate = new DateTime($date);
     $today = new DateTime();
@@ -61,6 +115,16 @@ function daysSinceTransaction(string $date): int {
     return $interval->days;
 }
 
+/**
+ * Добавляет новую транзакцию в массив.
+ *
+ * @param int $id Идентификатор транзакции.
+ * @param string $date Дата транзакции (формат YYYY-MM-DD).
+ * @param float $amount Сумма транзакции.
+ * @param string $description Описание транзакции.
+ * @param string $merchant Магазин или сервис.
+ * @return void
+ */
 function addTransaction(int $id, string $date, float $amount, string $description, string $merchant): void {
     global $transactions;
     $transactions[] = [
@@ -71,7 +135,9 @@ function addTransaction(int $id, string $date, float $amount, string $descriptio
         "merchant" => $merchant,
     ];
 }
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -103,7 +169,7 @@ if ($searchById) {
 echo "3. daysSinceTransaction is called <br>" . daysSinceTransaction($transactions[0]['date']) . "<br>";
 
 //Проверка addTransaction
-echo "A new transaction was added";
+echo "4. a new transaction was added, should be in the table";
 addTransaction(4, "2024-03-01", 99.99, "New purchase", "Online Store");
 
 ?>

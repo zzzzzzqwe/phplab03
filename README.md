@@ -12,7 +12,6 @@
 - удаления транзакций;
 - сортировки транзакций по дате или сумме;
 - поиска транзакций по описанию.
-## Выполнение
 ### 1.1 Подготовка среды
 Создаю новый php файл `index.php`, включаю строгую типизацию:
 ```php
@@ -206,3 +205,170 @@ function addTransaction(int $id, string $date, float $amount, string $descriptio
 ![image](screenshots/Screenshot_3.png)
 
 
+## 1.5 Сортировка
+
+Сортировка используя `usort`:
+
+*ВАЖНО: Сортировка распространяется только на существующие в массиве `$transactions` транзакции (новая добавленная транзакция не сортируется)*
+
+```php
+usort($transactions, function ($a, $b) {
+    return strtotime($a["date"]) - strtotime($b["date"]);
+ });
+
+```
+
+```php
+usort($transactions, function ($a, $b) {
+    return $b['amount'] <=> $a['amount'];
+ });
+
+```
+
+## 2. Работа с файловой системой.
+
+### 1. Создание директории для картинок
+
+Создаю директорию `/image` и сохраняю в нее 21 случайную картинку с расширением `.jpg`
+
+### 2. Создание файла с разметкой
+
+Создаю файл `index2.php` с веб-страницей с хедером, меню, контентом и футером:
+
+```
+<?php
+$dir = 'image/';
+$files = scandir($dir);
+?>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+        header {
+            background: #333;
+            color: white;
+            padding: 15px;
+            font-size: 24px;
+        }
+        nav {
+            background: #444;
+            padding: 10px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 10px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        .gallery img:hover {
+            transform: scale(1.1);
+        }
+        footer {
+            background: #333;
+            color: white;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Галерея изображений
+</header>
+
+<nav>
+    <a href="#">Главная</a>
+    <a href="#">О нас</a>
+    <a href="#">Контакты</a>
+</nav>
+
+<div class="gallery">
+    <?php
+    if ($files !== false) {
+        foreach ($files as $file) {
+            if (pathinfo($file, PATHINFO_EXTENSION) == 'jpg') {
+                echo "<img src='$dir$file' alt='Изображение'>";
+            }
+        }
+    } else {
+        echo "<p>Ошибка загрузки изображений</p>";
+    }
+    ?>
+</div>
+
+<footer>
+    © 2025 Галерея изображений
+</footer>
+
+</body>
+</html>
+
+```
+
+### 3. Вывожу картинки из директории на веб-страницу в виде галереи
+
+Реализую задачу следующими фрагментами кода:
+
+Определяю папку и сканирую директорию с картинками:
+
+```php
+<?php
+$dir = 'image/';
+$files = scandir($dir);
+?>
+```
+Проверяю, удалось ли получить список файлов, прохожу по каждому файлу в папке, проверяю, является ли он jpg изображением и вывожу <img> с найденным файлом
+
+```php
+<?php
+    if ($files !== false) {
+        foreach ($files as $file) {
+            if (pathinfo($file, PATHINFO_EXTENSION) == 'jpg') {
+                echo "<img src='$dir$file' alt='Изображение'>";
+            }
+        }
+    } else {
+        echo "<p>error</p>";
+    }
+    ?>
+```
+
+## Контрольные вопросы
+
+1. Что такое массивы в PHP?
+
+Массивы в PHP — это структуры данных, позволяющие хранить несколько значений в одной переменной. Они могут быть индексными, ассоциативными и многомерными.
+
+2. Каким образом можно создать массив в PHP?
+
+С помощью array() - `$arr = array(1, 2, 3);`
+С помощью [] - `$arr = [1, 2, 3];`
+Ассоциативный массив - `$user = ["name" => "Alex", "age" => 25];`
+
+3. Для чего используется цикл `foreach`?
+
+Цикл `foreach` используется для перебора элементов массива без необходимости отслеживать индексы.
